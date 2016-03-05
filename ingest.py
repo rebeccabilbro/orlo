@@ -76,7 +76,6 @@ def parsePage(key,mltype):
                 results[b['href']] = BASE_URL+a['href'].strip("../")+"/"+b['href']
     return results
 
-
 def getData(surl,fname):
     """
     For a dataset URL, use requests library to grab the dataset,
@@ -90,50 +89,10 @@ def getData(surl,fname):
     except:
         print "Couldn't get the file for %d" %surl
 
-def ingest(urldict):
-    """
-    Read the key, value pairs from a dictionary, get & store the datasets.
-    """
-    for key,val in urlsdict.items():
-        getData(BASE_URL+"datasets/"+val, BASE_STORE+key+".csv")
 
 if __name__ == '__main__':
-    # Create parent url dict
     links = readPage("../orlo/data/uci_text.txt")
     for name,pname in links.items():
         x = parsePage(pname,"Classification")
         for k,v in x.items():
             getData(v,BASE_STORE+k)
-
-    # testsets = {"pageblocks":"https://archive.ics.uci.edu/ml/machine-learning-databases/page-blocks/page-blocks.data.Z",
-    #             "winequality":"https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv",
-    #             "lenses":"https://archive.ics.uci.edu/ml/machine-learning-databases/lenses/lenses.data"}
-    # for k,v in testsets.items():
-    #
-    # with open('uci_links.csv', 'w') as f:
-    #     f.write(links)
-    # print ("Regression:")
-    # parsePage("cardiotocography","Regression")
-    # parsePage("lungcancer","Regression")
-    # parsePage("annealing","Regression")
-    # parsePage("kinship","Regression")
-    # print ("Classification:")
-    # parsePage("cardiotocography","Classification")
-    # parsePage("lung+cancer","Classification")
-    # parsePage("annealing","Classification")
-    # parsePage("kinship","Classication")
-    # print ("Relational:")
-    # parsePage("cardiotocography","Relational")
-    # parsePage("lungcancer","Relational")
-    # parsePage("annealing","Relational")
-    # parsePage("kinship","Relational")
-    # print ("Clustering:")
-    # parsePage("cardiotocography","Clustering")
-    # parsePage("lungcancer","Clustering")
-    # parsePage("annealing","Clustering")
-    # parsePage("kinship","Clustering")
-    # data_desc = requests.get('https://archive.ics.uci.edu/ml/datasets/annealing')
-    # desc = data_desc.content
-    # soup = BeautifulSoup(desc)
-    # for a in soup.find_all('a', href=re.compile("machine-learning-databases")):
-    #     print a['href']
