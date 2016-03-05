@@ -91,6 +91,7 @@ def getData(surl,fname):
 
 
 if __name__ == '__main__':
+    # getPage(UCI_URL)
     links = readPage("../orlo/data/uci_text.txt")
     for name,pname in links.items():
         x = parsePage(pname,"Classification")
