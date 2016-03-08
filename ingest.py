@@ -18,6 +18,7 @@ Ingest all the necessary datasets from UCI that are appropriate for classificati
 
 import os
 import re
+import random
 import requests
 from bs4 import BeautifulSoup
 
@@ -52,7 +53,6 @@ def readPage(fname):
         soup = BeautifulSoup(text)
         for a in soup.find_all('a', href=re.compile("datasets/")):
             pname = re.sub("datasets/","",str(a['href']))
-            # name = pname.split()
             name = re.sub(r'[^\w\s]','',pname).lower()
             if name not in urls:
                 urls[name] = pname
@@ -61,7 +61,8 @@ def readPage(fname):
 def parsePage(key,mltype):
     """
     Reads child urls from main url and determines whether the leaf node dataset
-    is for the machine learning type ("Classification", "Regression", "Relational").
+    is for the machine learning type ("Classification", "Regression", "Clustering",
+    "Relational").
     """
     results = {}
     data_desc = requests.get(BASE_URL+"datasets/"+key)
@@ -71,8 +72,8 @@ def parsePage(key,mltype):
         for a in soup.find_all('a', href=re.compile("machine-learning-databases")):
             data_idx = requests.get((BASE_URL+a['href'].strip("../")))
             index = data_idx.content
-            soup = BeautifulSoup(index)
-            for b in soup.find_all('a', href=re.compile(r'\b\.xls\b|\b\.data\b|\b\.csv\b')):
+            moresoup = BeautifulSoup(index)
+            for b in moresoup.find_all('a', href=re.compile(r'\b\.xls\b|\b\.data\b|\b\.csv\b')):
                 results[b['href']] = BASE_URL+a['href'].strip("../")+"/"+b['href']
     return results
 
@@ -87,13 +88,34 @@ def getData(surl,fname):
         with open(outpath, 'w') as f:
             f.write(response.content)
     except:
-        print "Couldn't get the file for %d" %surl
+        print "Couldn't get the file for '%s'" %surl
+
+def getAll(urls,criteria):
+    """
+    Given the urls, gets all of the datasets that meet the search criteria
+    """
+    print "Getting all the datasets for you - hope you have enough disk space!"
+    for name,pname in urls.items():
+        x = parsePage(pname,criteria)
+        for k,v in x.items():
+            getData(v,BASE_STORE+k)
+
+def getOne(urls,criteria):
+    """
+    Given the urls, get a random dataset that meets the search criteria
+    """
+    randompick = random.choice(urls.keys())
+    x = parsePage(urls[randompick],criteria)
+    if any(x):
+        for k,v in x.items():
+            print "Getting the '%s' dataset for you." %k
+            getData(v,BASE_STORE+k)
+    else: getOne(urls,criteria)
 
 
 if __name__ == '__main__':
-    # getPage(UCI_URL)
+    # read the links from the saved text file
     links = readPage("../orlo/data/uci_text.txt")
-    for name,pname in links.items():
-        x = parsePage(pname,"Classification")
-        for k,v in x.items():
-            getData(v,BASE_STORE+k)
+
+    # get a random dataset suitable for Classification
+    getOne(links,"Classification")
