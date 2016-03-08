@@ -17,6 +17,8 @@ The ROC is also known as a relative operating characteristic curve, because it i
 ## Recommended Reading    
 [Fawcett, Tom. "An introduction to ROC analysis."Pattern recognition letters 27.8 (2006): 861-874.](https://ccrma.stanford.edu/workshops/mir2009/references/ROCintro.pdf)
 
+
+## Code for ROC Curves    
 In Python, a basic template for plotting ROC curves using `scikit-learn` and `matplotlib` would be:
 
 ```python
