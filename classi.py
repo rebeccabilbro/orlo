@@ -22,6 +22,8 @@ from sklearn.svm import SVC
 # from sklearn.lda import LDA
 
 
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.feature_extraction import DictVectorizer
 
 from sklearn.metrics import f1_score
 from sklearn import cross_validation as cv
@@ -79,13 +81,11 @@ def labelFind(dataset):
 
     features = []
     for row in dataset:
-        row.remove(row[label_col[0]]) #TODO this doesn't work for isolet & tic-tac-toe
+        row.remove(row[label_col[0]])
         features.append(row)
 
     return tuple([features, targets])
 
-# TODO figure out how to do label encoding to transform text to input
-# http://scikit-learn.org/stable/modules/preprocessing.html#label-encoding
 
 
 def classi(features, targets):
@@ -109,20 +109,37 @@ def classi(features, targets):
 
 
 if __name__ == '__main__':
-    # labelFind(openFile("data/breast-cancer-wisconsin.data"))
-    bundle = labelFind(openFile("data/breast-cancer-wisconsin.data"))
-    # print classi(bundle[0],bundle[1])
-    print bundle[0][0]
-    print bundle[1][0]
+    bundle = labelFind(openFile("data/tic-tac-toe.data"))
+    # TODO figure out how to do label encoding to transform text to input
+    # http://scikit-learn.org/stable/modules/preprocessing.html#label-encoding
 
-    bundle = labelFind(openFile("data/balance-scale.data"))
-    print bundle[0][0]
-    print bundle[1][0]
+    labels = bundle[1]
+    label_enc = LabelEncoder()
+    encoded_labels = label_enc.fit_transform(labels)
+    print encoded_labels
 
-    bundle = labelFind("data/isolet5.data")
-    print bundle[0][0]
-    print bundle[1][0]
+    features = bundle[0]
+    mapping = []
+    for instance in range(len(features)):
+        D = dict()
+        for f in range(len(features[instance])):
+            D[f] = features[instance][f]
+            mapping.append(D)
 
-    bundle = labelFind("data/tic-tac-toe.data")
-    print bundle[0][0]
-    print bundle[1][0]
+    data_enc = DictVectorizer(sparse=False)
+    encoded_data = data_enc.fit_transform(mapping)
+    # print encoded_data
+
+
+
+    # bundle = labelFind(openFile("data/breast-cancer-wisconsin.data"))
+    # print bundle[0][0]
+    # print bundle[1][0]
+    #
+    # bundle = labelFind(openFile("data/balance-scale.data"))
+    # print bundle[0][0]
+    # print bundle[1][0]
+    #
+    # bundle = labelFind(openFile("data/isolet5.data"))
+    # print bundle[0][0]
+    # print bundle[1][0]
