@@ -2,7 +2,7 @@
 # roc.py
 
 
-# Title:        Plot ROC curves for Classified UCI Datasets for ROC Curves Tour
+# Title:        Plot ROC curves for tour
 # Author:       Rebecca Bilbro
 # Date:         3/8/16
 # Organization: District Data Labs
