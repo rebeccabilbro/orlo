@@ -20,6 +20,9 @@ import csv
 import numpy as np
 from sklearn.svm import SVC
 # from sklearn.lda import LDA
+
+
+
 from sklearn.metrics import f1_score
 from sklearn import cross_validation as cv
 from sklearn.naive_bayes import GaussianNB
@@ -38,37 +41,61 @@ estimators = ["LogisticRegression()","LDA()","GaussianNB()",\
 #####################################################################
 # Classification
 #####################################################################
-def labelFind(fname):
+def openFile(fname):
     """
     Opens data file and performs unique value count on each column.
     assumes that the column with the fewest unique values contains the labels
     for classification.
-    Outputs data organized as features, target.
+    Outputs label column.
     """
     with open(fname, 'rb') as csvfile:
         dialect = csv.Sniffer().sniff(csvfile.read(), delimiters=';,\t')
         csvfile.seek(0)
         reader = csv.reader(csvfile, dialect)
-        counts={}
-        for line in reader:
-            for key in range(0,len(line)):
-                if key not in counts:
-                    counts[key] = []
-                if line[key] not in counts[key]:
-                    counts[key].append(line[key])
+        data = list(reader)
+        return data
 
-        label_col = [k for k in counts.keys() if len(counts.get(k))==min([len(n) for n in counts.values()])]
-        labels = counts[label_col[0]]
-        print "column %d contains the labels, which are:" % label_col[0], labels
+def labelFind(dataset):
+    """
+    Performs unique value count on each column in dataset.
+    assumes that the column with the fewest unique values contains the labels
+    for classification.
+    Outputs label column.
+    """
+    counts={}
+    for line in dataset:
+        for key in range(0,len(line)):
+            if key not in counts:
+                counts[key] = []
+            if line[key] not in counts[key]:
+                counts[key].append(line[key])
+
+    label_col = [k for k in counts.keys() if len(counts.get(k))==min([len(n) for n in counts.values()])]
+    labels = counts[label_col[0]]
+
+    # print "column %d contains the labels, which are:" % label_col[0], labels
+
+    targets = [row[label_col[0]] for row in dataset]
+
+    features = []
+    for row in dataset:
+        row.remove(row[label_col[0]]) #TODO this doesn't work for isolet & tic-tac-toe
+        features.append(row)
+
+    return tuple([features, targets])
+
+# TODO figure out how to do label encoding to transform text to input
+# http://scikit-learn.org/stable/modules/preprocessing.html#label-encoding
 
 
-def classi(data, target):
+def classi(features, targets):
     """
     Takes data as input and runs different classifiers.
     Outputs a dict where the classifier name is the key, and the
     values are the expected and predicted values.
     """
-    splits     = cv.train_test_split(data, target, test_size=0.08)
+    splits     = cv.train_test_split(features, targets, test_size=0.08)
+            #TODO this doesn't work because the features aren't structured right
     X_train, X_test, y_train, y_test = splits
 
     results = {}
@@ -82,7 +109,20 @@ def classi(data, target):
 
 
 if __name__ == '__main__':
-    labelFind("data/balance-scale.data")
-    labelFind("data/breast-cancer-wisconsin.data")
-    labelFind("data/isolet5.data")
-    labelFind("data/tic-tac-toe.data")
+    # labelFind(openFile("data/breast-cancer-wisconsin.data"))
+    bundle = labelFind(openFile("data/breast-cancer-wisconsin.data"))
+    # print classi(bundle[0],bundle[1])
+    print bundle[0][0]
+    print bundle[1][0]
+
+    bundle = labelFind(openFile("data/balance-scale.data"))
+    print bundle[0][0]
+    print bundle[1][0]
+
+    bundle = labelFind("data/isolet5.data")
+    print bundle[0][0]
+    print bundle[1][0]
+
+    bundle = labelFind("data/tic-tac-toe.data")
+    print bundle[0][0]
+    print bundle[1][0]
