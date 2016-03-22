@@ -25,7 +25,7 @@ from sklearn.svm import SVC
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.feature_extraction import DictVectorizer
 
-from sklearn.metrics import f1_score
+from sklearn import metrics
 from sklearn import cross_validation as cv
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
@@ -36,9 +36,8 @@ from sklearn.ensemble import RandomForestClassifier
 #####################################################################
 # Global Variables
 #####################################################################
-estimators = ["LogisticRegression()","LDA()","GaussianNB()",\
-              "KNeighborsClassifier()","DecisionTreeClassifier()",\
-              "SVC(kernel=kernel)","RandomForestClassifier()"]
+estimators = [LogisticRegression(),GaussianNB(),KNeighborsClassifier(),\
+              DecisionTreeClassifier(),RandomForestClassifier()]
 
 #####################################################################
 # Classification
@@ -95,7 +94,6 @@ def classi(features, targets):
     values are the expected and predicted values.
     """
     splits     = cv.train_test_split(features, targets, test_size=0.08)
-            #TODO this doesn't work because the features aren't structured right
     X_train, X_test, y_train, y_test = splits
 
     results = {}
@@ -104,33 +102,30 @@ def classi(features, targets):
         model.fit(X_train, y_train)
         expected   = y_test
         predicted  = model.predict(X_test)
-        results[estimator] = (expected,predicted)
+
+        precision = metrics.precision_score(expected, predicted)
+        recall = metrics.recall_score(expected, predicted)
+        accuracy = metrics.accuracy_score(expected, predicted)
+        f1 = metrics.f1_score(expected, predicted)
+        results[model] = (precision,recall,accuracy,f1)
     return results
 
 
 if __name__ == '__main__':
     bundle = labelFind(openFile("data/tic-tac-toe.data"))
-    # TODO figure out how to do label encoding to transform text to input
-    # http://scikit-learn.org/stable/modules/preprocessing.html#label-encoding
-
     labels = bundle[1]
     label_enc = LabelEncoder()
     encoded_labels = label_enc.fit_transform(labels)
-    print encoded_labels
-
     features = bundle[0]
     mapping = []
     for instance in range(len(features)):
         D = dict()
         for f in range(len(features[instance])):
             D[f] = features[instance][f]
-            mapping.append(D)
-
+        mapping.append(D)
     data_enc = DictVectorizer(sparse=False)
     encoded_data = data_enc.fit_transform(mapping)
-    # print encoded_data
-
-
+    print classi(encoded_data, encoded_labels)
 
     # bundle = labelFind(openFile("data/breast-cancer-wisconsin.data"))
     # print bundle[0][0]
