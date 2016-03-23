@@ -44,10 +44,7 @@ estimators = [LogisticRegression(),GaussianNB(),KNeighborsClassifier(),\
 #####################################################################
 def openFile(fname):
     """
-    Opens data file and performs unique value count on each column.
-    assumes that the column with the fewest unique values contains the labels
-    for classification.
-    Outputs label column.
+    Opens data file.
     """
     with open(fname, 'rb') as csvfile:
         dialect = csv.Sniffer().sniff(csvfile.read(), delimiters=';,\t')
