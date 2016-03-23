@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import auc
 from sklearn.metrics import roc_curve
 
-IMG_STORE = "../orlo/figures/"
+IMG_STORE = "../orlo/rocgallery/"
 #####################################################################
 # Plotter
 #####################################################################
