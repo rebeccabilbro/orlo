@@ -1,3 +1,5 @@
 soupy.py
 /data
 figures/testfile.png
+*.DS_Store
+*.pyc
